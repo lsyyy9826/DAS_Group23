@@ -31,13 +31,52 @@ library(caret)
 ```
 
 # Introduction
+The surge in spam emails leads to wasted time, security risks, and financial losses. To address this issue, companies rely on spam filters to automatically classify emails and minimize disruptions. Therefore, studying the key text features that influence whether an email is classified as spam is crucial.
+**Research Question**
+Which text characteristics influence whether an email will be classified as spam or not? 
+#Exploratory Data Analysis
 
+##Description of Data
+
+###Data Source
+This dataset were collected at Hewlett-Packard Labs and shared with the UCI Machine Learning Repository. The dataset contains data on classifying emails as spam or not spam, with additional variables indicating the frequency of certain words and characters in the email.
 ```{r}
-data<-read.csv('D:/desktop/dataset23.csv') 
+data<-read.csv('C:/Users/apple/Desktop/DAS_Group/dataset23.csv') 
 data$yesno<-as.factor(data$yesno) 
 data <- data[rowSums(data[, 2:6] > 1) == 0, ] # the percentage of total numbe can not be greater than 1
 ```
 
+###Varaible Description
+
+This table provides variable descriptions to ensure clarity in their interpretation.
+```{r}
+#| label: table0
+#| tbl-cap: Description of Variables
+variable <- data.frame(
+  VariableName = colnames(data),  
+  Description = c("Total length of uninterrupted sequences of capitals ",  
+                  "Occurrences of the dollar sign, as a percentage of total number of characters ",
+                  " Occurrences of ‘!’, as a percentage of total number of characters ",
+                  "Occurrences of ‘money’, as a percentage of total number of characters",
+                  "Occurrences of the string ‘000’, as a percentage of total number of characters ",
+                  "Occurrences of ‘make’, as a percentage of total number of characters ",
+                  "A factor variable indicating if the email was spam, ‘y’, or not spam, ‘n’"),
+  Type = sapply(data, class)
+)
+variable %>%
+  gt() %>%
+  tab_header(
+    title = "Description of Variables"
+  ) %>%
+  tab_options(
+    table.width = pct(100)
+  )
+```
+
+###Data Visualization
+
+####summary of data
+This table shows the summary of the data.
 ```{r}
 #| label: table 1
 #| tbl-cap: summary of mean
@@ -51,11 +90,15 @@ data |>
     make = mean(make),
             .by = yesno) |>
   gt() |>
+  tab_header(
+ title= "mean of Variables") |>
   fmt_number(decimals=2)
 ```
+@table1 shows that for the variable(crl.tot): The average value in spam emails (409.26) is significantly higher than in non-spam emails (157.83). For the variable (dollar):
+the occurrence of the "$" symbol in spam emails is 13%, whereas in non-spam emails, it is only 1%. For the variable (bang!): the "!" symbol appears in 31% of spam emails, while in non-spam emails, it appears only 5% of the time. For the word "money" occurrence: The word "money" appears in 15% of spam emails, whereas in non-spam emails, it appears only 1% of the time. For the occurrence of "000" (n000): "000" appears in 15% of spam emails, but is almost nonexistent (0%) in non-spam emails. For the word "make" occurrence: The word "make" appears in 11% of spam emails, while in non-spam emails, it appears only 3% of the time.
 
 ```{r}
-#| label: table 2
+#| label: table2
 #| tbl-cap: summary of median
 data |>
   summarize(
@@ -67,21 +110,25 @@ data |>
     make = median(make),
     .by = yesno) |>
   gt() |>
+  tab_header(
+ title= "median of Variables") |>
   fmt_number(decimals=2)
-
 ```
+@table2 shows that for the variable (crl.tot): The median value in spam emails (190.50) is significantly higher than in non-spam emails (54.00). For the variable (dollar): The occurrence of the "$" symbol in spam emails has a median value of 0.06, whereas in non-spam emails,it is 0.00. For the variable (bang!): The "!" symbol appears in 25% of spam emails, while in non-spam emails, the median value is 0.00. For the word "money" occurrence: The median occurrence of "money" is 0.00 for both spam and non-spam emails. For the occurrence of "000" (n000): The median occurrence of "000" is 0.00 for both spam and non-spam emails. For the word "make" occurrence: The median occurrence of "make" is 0.00 for both spam and non-spam emails.
 
-#Most mean values greater than median values may indicate right skewness.
+Based on the @table1 and @table2,the result shows that most mean values greater than median values may indicate right skewness.
 
+####correlation
+the followed figure shows the correlation between the variables.
 ```{r}
-#| label: figure 1
+#| label: figure1
 #| fig-cap: Corrplot
 cor_matrix <- cor(data[, c("crl.tot", "dollar", "bang", "money", "n000", "make")])
 corrplot::corrplot(cor_matrix, method = "number") 
 ```
+As @figure1 shows, The maximum correlation between variables is 0.4, indicating that the correlation between variables is not high. Therefore, interaction terms will not be considered in the model.
 
-#correlation
-
+####Variable Visualization
 ```{r}
 #| label: figure 2
 #| fig-cap: Crl.tot by Class
