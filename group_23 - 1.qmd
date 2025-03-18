@@ -1,5 +1,5 @@
 ---
-title: "ADD TITLE"
+title: "Group 23"
 number-sections: true
 format: 
   html:
@@ -78,7 +78,7 @@ variable %>%
 ####summary of data
 This table shows the summary of the data.
 ```{r}
-#| label: table 1
+#| label: table1
 #| tbl-cap: summary of mean
 data |>
   summarize(
@@ -122,7 +122,7 @@ Based on the @table1 and @table2,the result shows that most mean values greater 
 the followed figure shows the correlation between the variables.
 ```{r}
 #| label: figure1
-#| fig-cap: Corrplot
+#| fig-cap: correlation between variables
 cor_matrix <- cor(data[, c("crl.tot", "dollar", "bang", "money", "n000", "make")])
 corrplot::corrplot(cor_matrix, method = "number") 
 ```
@@ -130,94 +130,103 @@ As @figure1 shows, The maximum correlation between variables is 0.4, indicating 
 
 ####Variable Visualization
 ```{r}
-#| label: figure 2
-#| fig-cap: Crl.tot by Class
+#| label: figure2
+#| fig-cap: Distribution of crl.tot between spam and non-spamemails
 ggplot(data, aes(x=yesno, y=crl.tot, fill=yesno)) +
   geom_boxplot() 
 ```
+@figure2 compares the distribution of the variable crl.tot between spam (y) and non-spam (n) emails.The median crl.tot value is higher in spam emails (y).Spam emails (y) have a larger interquartile range (IQR), indicating greater variability in crl.tot.Spam emails contain more extreme outliers, with some emails having crl.tot values exceeding 3000.Non-spam emails (n) have lower crl.tot values and a more concentrated distribution, with a lower median and fewer outliers compared to spam emails.
 
 ```{r}
-#| label: figure 3
-#| fig-cap: Crl.tot Density by Class
+#| label: figure3
+#| fig-cap: Distribution of crl.tot in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=crl.tot, fill=yesno)) +
   geom_density(alpha=0.5)
 ```
-
+@figure3 visualizes the distribution of the variable crl.tot for spam (y) and non-spam (n) emails. Non-spam emails (n) are highly concentrated around low crl.tot values. The pink region represents non-spam emails, forming a sharp peak near 0, indicating that most non-spam emails have very short uninterrupted capital letter sequences. However, spam emails (y) have a broader and more dispersed distribution. The blue region represents spam emails, which exhibit a right-skewed distribution. The distribution of spam emails shows a long tail, where although most spam emails have relatively small crl.tot values, some emails have extremely high crl.tot values, even exceeding 3000.
 
 ```{r}
-#| label: figure 4
-#| fig-cap: Bang by Class
+#| label: figure4
+#| fig-cap: Distribution of bang in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=yesno, y=bang, fill=yesno)) +
   geom_boxplot() 
 ```
+@figure4 shows the the distribution of bang for spam (y) and non-spam (n) emails. Bang values in non-spam emails (n) are very low. The pink box (non-spam emails) is concentrated near 0, indicating that most non-spam emails contain almost no exclamation marks. There are several outliers. However, spam emails (y) use significantly more exclamation marks. The blue box (spam emails) is wider, and the median bang value is much higher than that of non-spam emails. The interquartile range (IQR) is larger, indicating a greater variation in the use of exclamation marks in spam emails. The maximum bang value in spam emails is much higher than in non-spam emails.
 
 ```{r}
-#| label: figure 5
-#| fig-cap: Bang Density by Class
+#| label: figure5
+#| fig-cap: Distribution of bang in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=bang, fill=yesno)) +
   geom_density(alpha=0.5)
 ```
+@figure5 visualizes the distribution of bang for spam (y) and non-spam (n) emails. Non-spam emails (n) are highly concentrated at 0. The pink density area forms an extreme peak at bang = 0, indicating that most non-spam emails contain almost no exclamation marks (!).However, spam emails (y) have a more dispersed distribution. 
 
 ```{r}
-#| label: figure 6
-#| fig-cap: Money by Class
+#| label: figure6
+#| fig-cap: Distribution of money in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=yesno, y=money, fill=yesno)) +
   geom_boxplot()
 ```
+@figure6 visualizes the distribution of money for spam (y) and non-spam (n) emails. Non-spam emails (n) rarely contain the word "money". The pink box (non-spam emails) is fully concentrated around 0, but there are a few outliers. However, spam emails (y) have a significantly higher proportion of "money". The blue box (spam emails) is much larger than that of non-spam emails, with a higher median and interquartile range (IQR), and it also contains many extreme outliers.
 
 ```{r}
-#| label: figure 7
-#| fig-cap: Money Density by Class
+#| label: figure7
+#| fig-cap: Distribution of money in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=money, fill=yesno)) +
   geom_density(alpha=0.5) 
 ```
-
+@figure7 visualizes the distribution of money for spam (y) and non-spam (n) emails.Non-spam emails (n) are highly concentrated at 0. The pink density area  forms an extreme peak at 0.However, spam emails (y) have a broader distribution. The blue density area is more dispersed.
 
 ```{r}
-#| label: figure 8
-#| fig-cap: Dollar by Class
+#| label: figure8
+#| fig-cap: Distribution of dollar in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=yesno, y=dollar, fill=yesno)) +
   geom_boxplot()
 ```
+@figure8 shows the distribution of dollar for spam (y) and non-spam (n) emails. Non-spam emails (n) rarely contain the dollar sign. The pink box (non-spam emails) is fully concentrated at 0, with a few outliers. In contrast, spam emails (y) have a significantly higher proportion of dollar signs. The blue box (spam emails) is much larger than that of non-spam emails, with a higher median and interquartile range (IQR). Additionally, there are many extreme outliers.
 
 ```{r}
-#| label: figure 9
-#| fig-cap: Dollar Density by Class
+#| label: figure9
+#| fig-cap: Distribution of dollar in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=dollar, fill=yesno)) +
   geom_density(alpha=0.5)
 ```
+@figure9 shows that the distribution of dollar for spam (y) and non-spam (n) emails.
+Non-spam emails (n) are highly concentrated at dollar = 0. The pink density area forms an extreme peak at dollar = 0. However, spam emails (y) have a broader distribution. The blue density area is more dispersed.
 
 ```{r}
-#| label: figure 10
+#| label: figure10
 #| fig-cap: N000 by Class
 ggplot(data, aes(x=yesno, y=n000, fill=yesno)) +
   geom_boxplot() 
 ```
+@figure10 shows the distribution of n000 for spam (y) and non-spam (n) emails.Non-spam emails (n) rarely contain "000". The pink box (non-spam emails) is fully concentrated at 0, with a few outliers. However, the blue box (spam emails) is much larger than that of non-spam emails, with a higher median and interquartile range (IQR). The distribution of spam emails is more spread out and contains many extreme outliers.
 
 ```{r}
-#| label: figure 11
-#| fig-cap: N000 Density by Class
+#| label: figure11
+#| fig-cap: Distribution of n000 in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=n000, fill=yesno)) +
   geom_density(alpha=0.5)
 ```
-
+@figure11 shows the distribution of n000 for spam (y) and non-spam (n) emails. Non-spam emails (n) are highly concentrated at 0, with the pink density area forming an extreme peak at 0. Spam emails (y) have a broader distribution.
 
 ```{r}
-#| label: figure 12
+#| label: figure12
 #| fig-cap: Make by Class
 ggplot(data, aes(x=yesno, y=make, fill=yesno)) +
   geom_boxplot()
 ```
+@figure12 the distribution of make for spam (y) and non-spam (n) emails.Non-spam emails (n) rarely contain "make". The pink box (non-spam emails) is fully concentrated at 0, with multiple outliers. The proportion of "make" is significantly higher in spam emails (y). The blue box (spam emails) is larger than that of non-spam emails, with a higher median and interquartile range (IQR). The distribution of spam emails is more spread out and contains many extreme outliers.
 
 ```{r}
-#| label: figure 13
-#| fig-cap: Make Density by Class
+#| label: figure13
+#| fig-cap: Distribution of make in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=make, fill=yesno)) +
   geom_density(alpha=0.5)
 ```
+@figure13 shows the distribution of make (the proportion of the word "make" in the email) for spam (y) and non-spam (n) emails.Non-spam emails (n) are highly concentrated at 0, with the pink density area forming an extreme peak at 0. Spam emails (y) have a broader distribution, with the blue density area being more dispersed.
 
-
-#Replace values below the 1st percentile with the 1st percentile value and values over the 99th percentile with the 99th percentile value, then standardize the data to mitigate the effects of outliers and right skewness. Due to the wide distribution and right-skewed nature of crl.tot, we substitute it with log(data\$crl.tot + 1).
+Replace values below the 1st percentile with the 1st percentile value and values over the 99th percentile with the 99th percentile value, then standardize the data to mitigate the effects of outliers and right skewness. Due to the wide distribution and right-skewed nature of crl.tot, we substitute it with log(data\$crl.tot + 1).
 
 ```{r}
 data1<-data
