@@ -74,6 +74,8 @@ data |>
 #Most mean values greater than median values may indicate right skewness.
 
 ```{r}
+#| label: figure 1
+#| fig-cap: Corrplot
 cor_matrix <- cor(data[, c("crl.tot", "dollar", "bang", "money", "n000", "make")])
 corrplot::corrplot(cor_matrix, method = "number") 
 ```
@@ -81,58 +83,92 @@ corrplot::corrplot(cor_matrix, method = "number")
 #correlation
 
 ```{r}
+#| label: figure 2
+#| fig-cap: Crl.tot by Class
 ggplot(data, aes(x=yesno, y=crl.tot, fill=yesno)) +
-  geom_boxplot() +
-  labs(title="crl.tot by Class")
+  geom_boxplot() 
+```
+
+```{r}
+#| label: figure 3
+#| fig-cap: Crl.tot Density by Class
 ggplot(data, aes(x=crl.tot, fill=yesno)) +
-  geom_density(alpha=0.5) +
-  labs(title="crl.tot Density by Class")
+  geom_density(alpha=0.5)
 ```
 
+
 ```{r}
+#| label: figure 4
+#| fig-cap: Bang by Class
 ggplot(data, aes(x=yesno, y=bang, fill=yesno)) +
-  geom_boxplot() +
-  labs(title="bang by Class")
+  geom_boxplot() 
+```
+
+```{r}
+#| label: figure 5
+#| fig-cap: Bang Density by Class
 ggplot(data, aes(x=bang, fill=yesno)) +
-  geom_density(alpha=0.5) +
-  labs(title="bang Density by Class")
+  geom_density(alpha=0.5)
 ```
 
 ```{r}
+#| label: figure 6
+#| fig-cap: Money by Class
 ggplot(data, aes(x=yesno, y=money, fill=yesno)) +
-  geom_boxplot() +
-  labs(title="money by Class")
+  geom_boxplot()
+```
+
+```{r}
+#| label: figure 7
+#| fig-cap: Money Density by Class
 ggplot(data, aes(x=money, fill=yesno)) +
-  geom_density(alpha=0.5) +
-  labs(title="money Density by Class")
+  geom_density(alpha=0.5) 
 ```
 
+
 ```{r}
+#| label: figure 8
+#| fig-cap: Dollar by Class
 ggplot(data, aes(x=yesno, y=dollar, fill=yesno)) +
-  geom_boxplot() +
-  labs(title="dollar by Class")
+  geom_boxplot()
+```
+
+```{r}
+#| label: figure 9
+#| fig-cap: Dollar Density by Class
 ggplot(data, aes(x=dollar, fill=yesno)) +
-  geom_density(alpha=0.5) +
-  labs(title="dollar Density by Class")
+  geom_density(alpha=0.5)
 ```
 
 ```{r}
+#| label: figure 10
+#| fig-cap: N000 by Class
 ggplot(data, aes(x=yesno, y=n000, fill=yesno)) +
-  geom_boxplot() +
-  labs(title="n000 by Class")
-ggplot(data, aes(x=n000, fill=yesno)) +
-  geom_density(alpha=0.5) +
-  labs(title="n000 Density by Class")
+  geom_boxplot() 
 ```
 
 ```{r}
-ggplot(data, aes(x=yesno, y=make, fill=yesno)) +
-  geom_boxplot() +
-  labs(title="make by Class")
-ggplot(data, aes(x=make, fill=yesno)) +
-  geom_density(alpha=0.5) +
-  labs(title="make Density by Class")
+#| label: figure 11
+#| fig-cap: N000 Density by Class
+ggplot(data, aes(x=n000, fill=yesno)) +
+  geom_density(alpha=0.5)
 ```
+
+
+```{r}
+#| label: figure 12
+#| fig-cap: Make by Class
+ggplot(data, aes(x=yesno, y=make, fill=yesno)) +
+  geom_boxplot()
+```
+
+```{r}
+#| label: figure 13
+#| fig-cap: Make Density by Class
+ggplot(data, aes(x=make, fill=yesno)) +
+  geom_density(alpha=0.5)
+```
+
 
 #Replace values below the 1st percentile with the 1st percentile value and values over the 99th percentile with the 99th percentile value, then standardize the data to mitigate the effects of outliers and right skewness. Due to the wide distribution and right-skewed nature of crl.tot, we substitute it with log(data\$crl.tot + 1).
 
@@ -204,12 +240,21 @@ model_scale_log <- glm(yesno ~ bang + crl.tot_log + dollar+money+n000+make,
 summary(model_scale_log)
 
 AIC(model_original,model_scale,model_scale_log)
+BIC(model_original,model_scale,model_scale_log)
 ```
 
 ```{r}
+#| label: figure 14
+#| fig-cap: Coefficient Estimates with p-Values 
 plot_model(model_scale_log, show.values = TRUE, show.p = TRUE)
+```
+
+```{r}
+#| label: figure 15
+#| fig-cap: Marginal Predicted Effects
 plot_model(model_scale_log, type = "pred", title = "",col='steelblue')
 ```
+
 
 # Further Work
 
@@ -238,8 +283,14 @@ rf_pred_class <- ifelse(rf_pred_prob > 0.5,'y','n')
 
 rf_confusion <- confusionMatrix(factor(rf_pred_class), factor(test_data$yesno))
 rf_roc <- roc(test_data$yesno, rf_pred_prob)
-varImpPlot(rf_model, main="Predicting")
 ```
+
+```{r}
+#| label: figure 16
+#| fig-cap: RF Variable Importance Ranking
+varImpPlot(rf_model)
+```
+
 
 ```{r}
 get_model_metrics <- function(model_name, confusion,k) {
@@ -265,7 +316,9 @@ knitr::kable(results, align = "c")
 ```
 
 ```{r}
-plot(glm_roc, col = "blue", main = "ROC Curve")
+#| label: figure 17
+#| fig-cap: ROC Curve Comparison (GLM & RF)
+plot(glm_roc, col = "blue")
 lines(rf_roc, col = "red")
 legend("bottomright", legend = c("GLM", "randomForest"), col = c("blue", "red"), lwd = 2)
 ```
