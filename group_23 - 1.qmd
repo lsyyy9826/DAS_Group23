@@ -12,6 +12,9 @@ execute:
   eval: true
   warning: false
   message: false
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r}
@@ -31,27 +34,40 @@ library(caret)
 ```
 
 # Introduction
-The surge in spam emails leads to wasted time, security risks, and financial losses. To address this issue, companies rely on spam filters to automatically classify emails and minimize disruptions. Therefore, studying the key text features that influence whether an email is classified as spam is crucial.
-**Research Question**
-Which text characteristics influence whether an email will be classified as spam or not? 
-#Exploratory Data Analysis
 
-##Description of Data
+The surge in spam emails leads to wasted time, security risks, and
+financial losses. To address this issue, companies rely on spam filters
+to automatically classify emails and minimize disruptions. Therefore,
+studying the key text features that influence whether an email is
+classified as spam is crucial. **Research Question** Which text
+characteristics influence whether an email will be classified as spam or
+not?
 
-###Data Source
-This dataset were collected at Hewlett-Packard Labs and shared with the UCI Machine Learning Repository. The dataset contains data on classifying emails as spam or not spam, with additional variables indicating the frequency of certain words and characters in the email.
+# Exploratory Data Analysis
+
+## Description of Data
+
+### Data Source
+
+This dataset were collected at Hewlett-Packard Labs and shared with the
+UCI Machine Learning Repository. The dataset contains data on
+classifying emails as spam or not spam, with additional variables
+indicating the frequency of certain words and characters in the email.
+
 ```{r}
 data<-read.csv('C:/Users/apple/Desktop/DAS_Group/dataset23.csv') 
 data$yesno<-as.factor(data$yesno) 
 data <- data[rowSums(data[, 2:6] > 1) == 0, ] # the percentage of total numbe can not be greater than 1
 ```
 
-###Varaible Description
+### Varaible Description
 
-This table provides variable descriptions to ensure clarity in their interpretation.
+This table provides variable descriptions to ensure clarity in their
+interpretation.
+
 ```{r}
 #| label: table0
-#| tbl-cap: Description of Variables
+#| tbl-cap: "Description of Variables"
 variable <- data.frame(
   VariableName = colnames(data),  
   Description = c("Total length of uninterrupted sequences of capitals ",  
@@ -73,13 +89,15 @@ variable %>%
   )
 ```
 
-###Data Visualization
+### Data Visualization
 
-####summary of data
+#### summary of data
+
 This table shows the summary of the data.
+
 ```{r}
-#| label: table1
-#| tbl-cap: summary of mean
+#| label: tbl-table1
+#| tbl-cap: "summary of mean"
 data |>
   summarize(
     crl.tot = mean(crl.tot),
@@ -94,12 +112,23 @@ data |>
  title= "mean of Variables") |>
   fmt_number(decimals=2)
 ```
-@table1 shows that for the variable(crl.tot): The average value in spam emails (409.26) is significantly higher than in non-spam emails (157.83). For the variable (dollar):
-the occurrence of the "$" symbol in spam emails is 13%, whereas in non-spam emails, it is only 1%. For the variable (bang!): the "!" symbol appears in 31% of spam emails, while in non-spam emails, it appears only 5% of the time. For the word "money" occurrence: The word "money" appears in 15% of spam emails, whereas in non-spam emails, it appears only 1% of the time. For the occurrence of "000" (n000): "000" appears in 15% of spam emails, but is almost nonexistent (0%) in non-spam emails. For the word "make" occurrence: The word "make" appears in 11% of spam emails, while in non-spam emails, it appears only 3% of the time.
+
+@tbl-table1 shows that for the variable(crl.tot): The average value in spam
+emails (409.26) is significantly higher than in non-spam emails
+(157.83). For the variable (dollar): the occurrence of the "\$" symbol
+in spam emails is 13%, whereas in non-spam emails, it is only 1%. For
+the variable (bang!): the "!" symbol appears in 31% of spam emails,
+while in non-spam emails, it appears only 5% of the time. For the word
+"money" occurrence: The word "money" appears in 15% of spam emails,
+whereas in non-spam emails, it appears only 1% of the time. For the
+occurrence of "000" (n000): "000" appears in 15% of spam emails, but is
+almost nonexistent (0%) in non-spam emails. For the word "make"
+occurrence: The word "make" appears in 11% of spam emails, while in
+non-spam emails, it appears only 3% of the time.
 
 ```{r}
-#| label: table2
-#| tbl-cap: summary of median
+#| label: tbl-table2
+#| tbl-cap: "summary of median"
 data |>
   summarize(
     crl.tot = median(crl.tot),
@@ -114,120 +143,220 @@ data |>
  title= "median of Variables") |>
   fmt_number(decimals=2)
 ```
-@table2 shows that for the variable (crl.tot): The median value in spam emails (190.50) is significantly higher than in non-spam emails (54.00). For the variable (dollar): The occurrence of the "$" symbol in spam emails has a median value of 0.06, whereas in non-spam emails,it is 0.00. For the variable (bang!): The "!" symbol appears in 25% of spam emails, while in non-spam emails, the median value is 0.00. For the word "money" occurrence: The median occurrence of "money" is 0.00 for both spam and non-spam emails. For the occurrence of "000" (n000): The median occurrence of "000" is 0.00 for both spam and non-spam emails. For the word "make" occurrence: The median occurrence of "make" is 0.00 for both spam and non-spam emails.
 
-Based on the @table1 and @table2,the result shows that most mean values greater than median values may indicate right skewness.
+@tbl-table2 shows that for the variable (crl.tot): The median value in spam
+emails (190.50) is significantly higher than in non-spam emails (54.00).
+For the variable (dollar): The occurrence of the "\$" symbol in spam
+emails has a median value of 0.06, whereas in non-spam emails,it is
+0.00. For the variable (bang!): The "!" symbol appears in 25% of spam
+emails, while in non-spam emails, the median value is 0.00. For the word
+"money" occurrence: The median occurrence of "money" is 0.00 for both
+spam and non-spam emails. For the occurrence of "000" (n000): The median
+occurrence of "000" is 0.00 for both spam and non-spam emails. For the
+word "make" occurrence: The median occurrence of "make" is 0.00 for both
+spam and non-spam emails.
 
-####correlation
+Based on the @table1 and @table2,the result shows that most mean values
+greater than median values may indicate right skewness.
+
+#### correlation
+
 the followed figure shows the correlation between the variables.
+
 ```{r}
-#| label: figure1
-#| fig-cap: correlation between variables
+#| label: fig-figure1
+#| fig-cap: "correlation between variables"
 cor_matrix <- cor(data[, c("crl.tot", "dollar", "bang", "money", "n000", "make")])
 corrplot::corrplot(cor_matrix, method = "number") 
 ```
-As @figure1 shows, The maximum correlation between variables is 0.4, indicating that the correlation between variables is not high. Therefore, interaction terms will not be considered in the model.
 
-####Variable Visualization
+As @fig-figure1 shows, The maximum correlation between variables is 0.4,
+indicating that the correlation between variables is not high.
+Therefore, interaction terms will not be considered in the model.
+
+#### Variable Visualization
+
 ```{r}
-#| label: figure2
+#| label: fig-figure2
 #| fig-cap: Distribution of crl.tot between spam and non-spamemails
 ggplot(data, aes(x=yesno, y=crl.tot, fill=yesno)) +
   geom_boxplot() 
 ```
-@figure2 compares the distribution of the variable crl.tot between spam (y) and non-spam (n) emails.The median crl.tot value is higher in spam emails (y).Spam emails (y) have a larger interquartile range (IQR), indicating greater variability in crl.tot.Spam emails contain more extreme outliers, with some emails having crl.tot values exceeding 3000.Non-spam emails (n) have lower crl.tot values and a more concentrated distribution, with a lower median and fewer outliers compared to spam emails.
+
+@fig-figure2 compares the distribution of the variable crl.tot between spam
+(y) and non-spam (n) emails.The median crl.tot value is higher in spam
+emails (y).Spam emails (y) have a larger interquartile range (IQR),
+indicating greater variability in crl.tot.Spam emails contain more
+extreme outliers, with some emails having crl.tot values exceeding
+3000.Non-spam emails (n) have lower crl.tot values and a more
+concentrated distribution, with a lower median and fewer outliers
+compared to spam emails.
 
 ```{r}
-#| label: figure3
+#| label: fig-figure3
 #| fig-cap: Distribution of crl.tot in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=crl.tot, fill=yesno)) +
   geom_density(alpha=0.5)
 ```
-@figure3 visualizes the distribution of the variable crl.tot for spam (y) and non-spam (n) emails. Non-spam emails (n) are highly concentrated around low crl.tot values. The pink region represents non-spam emails, forming a sharp peak near 0, indicating that most non-spam emails have very short uninterrupted capital letter sequences. However, spam emails (y) have a broader and more dispersed distribution. The blue region represents spam emails, which exhibit a right-skewed distribution. The distribution of spam emails shows a long tail, where although most spam emails have relatively small crl.tot values, some emails have extremely high crl.tot values, even exceeding 3000.
+
+@fig-figure3 visualizes the distribution of the variable crl.tot for spam
+(y) and non-spam (n) emails. Non-spam emails (n) are highly concentrated
+around low crl.tot values. The pink region represents non-spam emails,
+forming a sharp peak near 0, indicating that most non-spam emails have
+very short uninterrupted capital letter sequences. However, spam emails
+(y) have a broader and more dispersed distribution. The blue region
+represents spam emails, which exhibit a right-skewed distribution. The
+distribution of spam emails shows a long tail, where although most spam
+emails have relatively small crl.tot values, some emails have extremely
+high crl.tot values, even exceeding 3000.
 
 ```{r}
-#| label: figure4
+#| label: fig-figure4
 #| fig-cap: Distribution of bang in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=yesno, y=bang, fill=yesno)) +
   geom_boxplot() 
 ```
-@figure4 shows the the distribution of bang for spam (y) and non-spam (n) emails. Bang values in non-spam emails (n) are very low. The pink box (non-spam emails) is concentrated near 0, indicating that most non-spam emails contain almost no exclamation marks. There are several outliers. However, spam emails (y) use significantly more exclamation marks. The blue box (spam emails) is wider, and the median bang value is much higher than that of non-spam emails. The interquartile range (IQR) is larger, indicating a greater variation in the use of exclamation marks in spam emails. The maximum bang value in spam emails is much higher than in non-spam emails.
+
+@fig-figure4 shows the the distribution of bang for spam (y) and non-spam
+(n) emails. Bang values in non-spam emails (n) are very low. The pink
+box (non-spam emails) is concentrated near 0, indicating that most
+non-spam emails contain almost no exclamation marks. There are several
+outliers. However, spam emails (y) use significantly more exclamation
+marks. The blue box (spam emails) is wider, and the median bang value is
+much higher than that of non-spam emails. The interquartile range (IQR)
+is larger, indicating a greater variation in the use of exclamation
+marks in spam emails. The maximum bang value in spam emails is much
+higher than in non-spam emails.
 
 ```{r}
-#| label: figure5
+#| label: fig-figure5
 #| fig-cap: Distribution of bang in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=bang, fill=yesno)) +
   geom_density(alpha=0.5)
 ```
-@figure5 visualizes the distribution of bang for spam (y) and non-spam (n) emails. Non-spam emails (n) are highly concentrated at 0. The pink density area forms an extreme peak at bang = 0, indicating that most non-spam emails contain almost no exclamation marks (!).However, spam emails (y) have a more dispersed distribution. 
+
+@fig-figure5 visualizes the distribution of bang for spam (y) and non-spam
+(n) emails. Non-spam emails (n) are highly concentrated at 0. The pink
+density area forms an extreme peak at bang = 0, indicating that most
+non-spam emails contain almost no exclamation marks (!).However, spam
+emails (y) have a more dispersed distribution.
 
 ```{r}
-#| label: figure6
+#| label: fig-figure6
 #| fig-cap: Distribution of money in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=yesno, y=money, fill=yesno)) +
   geom_boxplot()
 ```
-@figure6 visualizes the distribution of money for spam (y) and non-spam (n) emails. Non-spam emails (n) rarely contain the word "money". The pink box (non-spam emails) is fully concentrated around 0, but there are a few outliers. However, spam emails (y) have a significantly higher proportion of "money". The blue box (spam emails) is much larger than that of non-spam emails, with a higher median and interquartile range (IQR), and it also contains many extreme outliers.
+
+@fig-figure6 visualizes the distribution of money for spam (y) and non-spam
+(n) emails. Non-spam emails (n) rarely contain the word "money". The
+pink box (non-spam emails) is fully concentrated around 0, but there are
+a few outliers. However, spam emails (y) have a significantly higher
+proportion of "money". The blue box (spam emails) is much larger than
+that of non-spam emails, with a higher median and interquartile range
+(IQR), and it also contains many extreme outliers.
 
 ```{r}
-#| label: figure7
+#| label: fig-figure7
 #| fig-cap: Distribution of money in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=money, fill=yesno)) +
   geom_density(alpha=0.5) 
 ```
-@figure7 visualizes the distribution of money for spam (y) and non-spam (n) emails.Non-spam emails (n) are highly concentrated at 0. The pink density area  forms an extreme peak at 0.However, spam emails (y) have a broader distribution. The blue density area is more dispersed.
+
+@fig-figure7 visualizes the distribution of money for spam (y) and non-spam
+(n) emails.Non-spam emails (n) are highly concentrated at 0. The pink
+density area forms an extreme peak at 0.However, spam emails (y) have a
+broader distribution. The blue density area is more dispersed.
 
 ```{r}
-#| label: figure8
+#| label: fig-figure8
 #| fig-cap: Distribution of dollar in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=yesno, y=dollar, fill=yesno)) +
   geom_boxplot()
 ```
-@figure8 shows the distribution of dollar for spam (y) and non-spam (n) emails. Non-spam emails (n) rarely contain the dollar sign. The pink box (non-spam emails) is fully concentrated at 0, with a few outliers. In contrast, spam emails (y) have a significantly higher proportion of dollar signs. The blue box (spam emails) is much larger than that of non-spam emails, with a higher median and interquartile range (IQR). Additionally, there are many extreme outliers.
+
+@fig-figure8 shows the distribution of dollar for spam (y) and non-spam (n)
+emails. Non-spam emails (n) rarely contain the dollar sign. The pink box
+(non-spam emails) is fully concentrated at 0, with a few outliers. In
+contrast, spam emails (y) have a significantly higher proportion of
+dollar signs. The blue box (spam emails) is much larger than that of
+non-spam emails, with a higher median and interquartile range (IQR).
+Additionally, there are many extreme outliers.
 
 ```{r}
-#| label: figure9
+#| label: fig-figure9
 #| fig-cap: Distribution of dollar in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=dollar, fill=yesno)) +
   geom_density(alpha=0.5)
 ```
-@figure9 shows that the distribution of dollar for spam (y) and non-spam (n) emails.
-Non-spam emails (n) are highly concentrated at dollar = 0. The pink density area forms an extreme peak at dollar = 0. However, spam emails (y) have a broader distribution. The blue density area is more dispersed.
+
+@fig-figure9 shows that the distribution of dollar for spam (y) and non-spam
+(n) emails. Non-spam emails (n) are highly concentrated at dollar = 0.
+The pink density area forms an extreme peak at dollar = 0. However, spam
+emails (y) have a broader distribution. The blue density area is more
+dispersed.
 
 ```{r}
-#| label: figure10
-#| fig-cap: N000 by Class
+#| label: fig-figure10
+#| fig-cap: Distribution of n000 for spam (y) and non-spam (n) emails
 ggplot(data, aes(x=yesno, y=n000, fill=yesno)) +
   geom_boxplot() 
 ```
-@figure10 shows the distribution of n000 for spam (y) and non-spam (n) emails.Non-spam emails (n) rarely contain "000". The pink box (non-spam emails) is fully concentrated at 0, with a few outliers. However, the blue box (spam emails) is much larger than that of non-spam emails, with a higher median and interquartile range (IQR). The distribution of spam emails is more spread out and contains many extreme outliers.
+
+@fig-figure10 shows the distribution of n000 for spam (y) and non-spam (n)
+emails.Non-spam emails (n) rarely contain "000". The pink box (non-spam
+emails) is fully concentrated at 0, with a few outliers. However, the
+blue box (spam emails) is much larger than that of non-spam emails, with
+a higher median and interquartile range (IQR). The distribution of spam
+emails is more spread out and contains many extreme outliers.
 
 ```{r}
-#| label: figure11
+#| label: fig-figure11
 #| fig-cap: Distribution of n000 in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=n000, fill=yesno)) +
   geom_density(alpha=0.5)
 ```
-@figure11 shows the distribution of n000 for spam (y) and non-spam (n) emails. Non-spam emails (n) are highly concentrated at 0, with the pink density area forming an extreme peak at 0. Spam emails (y) have a broader distribution.
+
+@fig-figure11 shows the distribution of n000 for spam (y) and non-spam (n)
+emails. Non-spam emails (n) are highly concentrated at 0, with the pink
+density area forming an extreme peak at 0. Spam emails (y) have a
+broader distribution.
 
 ```{r}
-#| label: figure12
-#| fig-cap: Make by Class
+#| label: fig-figure12
+#| fig-cap: Distribution of make for spam (y) and non-spam (n) emails
 ggplot(data, aes(x=yesno, y=make, fill=yesno)) +
   geom_boxplot()
 ```
-@figure12 the distribution of make for spam (y) and non-spam (n) emails.Non-spam emails (n) rarely contain "make". The pink box (non-spam emails) is fully concentrated at 0, with multiple outliers. The proportion of "make" is significantly higher in spam emails (y). The blue box (spam emails) is larger than that of non-spam emails, with a higher median and interquartile range (IQR). The distribution of spam emails is more spread out and contains many extreme outliers.
+
+@fig-figure12 the distribution of make for spam (y) and non-spam (n)
+emails.Non-spam emails (n) rarely contain "make". The pink box (non-spam
+emails) is fully concentrated at 0, with multiple outliers. The
+proportion of "make" is significantly higher in spam emails (y). The
+blue box (spam emails) is larger than that of non-spam emails, with a
+higher median and interquartile range (IQR). The distribution of spam
+emails is more spread out and contains many extreme outliers.
 
 ```{r}
-#| label: figure13
+#| label: fig-figure13
 #| fig-cap: Distribution of make in Spam (y) and Non-Spam (n) Emails
 ggplot(data, aes(x=make, fill=yesno)) +
   geom_density(alpha=0.5)
 ```
-@figure13 shows the distribution of make (the proportion of the word "make" in the email) for spam (y) and non-spam (n) emails.Non-spam emails (n) are highly concentrated at 0, with the pink density area forming an extreme peak at 0. Spam emails (y) have a broader distribution, with the blue density area being more dispersed.
 
+@fig-figure13 shows the distribution of make (the proportion of the word
+"make" in the email) for spam (y) and non-spam (n) emails.Non-spam
+emails (n) are highly concentrated at 0, with the pink density area
+forming an extreme peak at 0. Spam emails (y) have a broader
+distribution, with the blue density area being more dispersed.
 
-Replace values below the 1st percentile with the 1st percentile value and values over the 99th percentile with the 99th percentile value, then standardize the data to mitigate the effects of outliers and right skewness. Due to the wide distribution and right-skewed nature of crl.tot, we substitute it with log(data\$crl.tot + 1).
+## Data Preprocessing
+
+Replace values below the 1st percentile with the 1st percentile value
+and values over the 99th percentile with the 99th percentile value, then
+standardize the data to mitigate the effects of outliers and right
+skewness. Due to the wide distribution and right-skewed nature of
+crl.tot, we substitute it with log(data\$crl.tot + 1).
 
 ```{r}
 data1<-data
@@ -245,39 +374,63 @@ data$crl.tot_log <- log(data$crl.tot+1)
 
 ```
 
+# Modelling
+
+In the modeling section, data preprocessing was first conducted,
+including winsorization (outlier removal), standardization, and
+logarithmic transformation. Subsequently, three logistic regression
+models were constructed: one using the original data, one with
+standardized variables, and another incorporating log-transformed
+variables. The Akaike Information Criterion (AIC) was employed to
+compare model performance. Finally, regression coefficients and
+predictive outcomes were visualized. The ultimate objective was to
+identify the optimal transformation of predictor variables to enhance
+model performance.
+
 $$Y_i \sim \mathrm{Bernoulli}(p_i)$$
 
 $$\quad \log\left( \frac{p_i}{1 - p_i} \right) = \beta_0 + \beta_1 \text{crl.tot}_i + \beta_2 \text{dollar}_i + \beta_3 \text{bang}_i + \beta_4 \text{money}_i + \beta_5 \text{n000}_i + \beta_6 \text{make}_i$$
 
--**$Y_i$** is ..
+## Variable Definitions
 
--**$\text{crl.tot}_i$** is..
+-   $$Y_i$$: A binary factor variable indicating if the email was spam
+    (`y`) or not (`n`).
+-   $$\text{crl.tot}_i$$: Total length of uninterrupted sequences
+    of capital letters.
+-   $$\text{dollar}_i$$: Occurrences of the dollar sign (`$`),
+    as a percentage of total number of characters.
+-   $$\text{bang}_i$$: Occurrences of `!`, as a percentage of
+    total number of characters.
+-   $$\text{money}_i$$: Occurrences of the word "money", as a
+    percentage of total number of characters.
+-   $$\text{n000}_i$$: Occurrences of the string "000", as a
+    percentage of total number of characters.
+-   $$\text{make}_i$$: Occurrences of the word "make", as a
+    percentage of total number of characters.
 
--**$\text{dollar}_i$** is..
+## Alternative Model with Log Transformation
 
--**$\text{bang}_i$** is..
-
--**$\text{money}_i$** is
-
--**$\text{n000}_i$** is
-
--**$\text{make}_i$** is ..
+An alternative model is estimated with a log transformation of crl.tot:
 
 $$\quad \log\left( \frac{p_i}{1 - p_i} \right) = \beta_0 + \beta_1 log(\text{crl.tot}_i) + \beta_2 \text{dollar}_i + \beta_3 \text{bang}_i + \beta_4 \text{money}_i + \beta_5 \text{n000}_i + \beta_6 \text{make}_i$$
 
--**$Y_i$** is ..
+-   $$Y_i$$: A binary factor variable indicating if the email was spam
+    (`y`) or not (`n`). 
+-   $$log(\text{crl.tot}_i)$$: The
+    logarithm-transformed length of uninterrupted sequences of capital
+    letters.
+-   $$\text{dollar}_i$$: Occurrences of the dollar sign (`$`), as
+    a percentage of total number of characters.
+-   $$\text{bang}_i$$: Occurrences of `!`, as a percentage of
+    total number of characters.
+-   $$\text{money}_i$$: Occurrences of the word "money", as a
+    percentage of total number of characters.
+-   $$\text{n000}_i$$: Occurrences of the string "000", as a
+    percentage of total number of characters.
+-   $$\text{make}_i$$: Occurrences of the word "make", as a
+    percentage of total number of characters.
 
--**$log(\text{crl.tot}_i)$** is..
-
--**$\text{dollar}_i$** is..
-
--**$\text{bang}_i$** is..
-
--**$\text{money}_i$** is
-
--**$\text{n000}_i$** is
-
--**$\text{make}_i$** is ..
+## Logistic regression models
 
 ```{r}
 model_original <- glm(yesno ~ crl.tot + dollar + bang + money + n000 + make,
@@ -300,28 +453,73 @@ AIC(model_original,model_scale,model_scale_log)
 BIC(model_original,model_scale,model_scale_log)
 ```
 
+The Akaike Information Criterion (AIC) values indicate the performance
+of the three logistic regression models: - model_original: AIC =
+592.74 - model_scale: AIC = 589.17 (improved after standardization) -
+model_scale_log: AIC = 579.11 (best-performing model with log
+transformation)
+
+Since a lower AIC value indicates a better fit, the log-transformed
+model (`model_scale_log`) is the optimal choice, as it achieves the
+lowest AIC.
+
 ```{r}
-#| label: figure 14
+#| label: fig-figure14
 #| fig-cap: Coefficient Estimates with p-Values 
 plot_model(model_scale_log, show.values = TRUE, show.p = TRUE)
 ```
 
+@fig-figure14 displays the estimated odds ratios: Significant Positive
+Effects: `bang` (3.11), `crl.tot_log` (1.93), `dollar` (2.32), `money`
+(2.03), and `n000` (3.17) all have positive effects on the probability
+of an email being spam. This means that higher occurrences of these
+features increase the likelihood of spam classification. Non-Significant
+/ Negative Effect: `make` (0.86) has a negative effect and is not
+statistically significant, meaning it does not contribute to predicting
+spam effectively.
+
 ```{r}
-#| label: figure 15
+#| label: fig-figure15
 #| fig-cap: Marginal Predicted Effects
+#| fig-align: center
 plot_model(model_scale_log, type = "pred", title = "",col='steelblue')
 ```
 
+The plots display the estimated odds ratios: Significant Positive
+Effects: `bang` (3.11), `crl.tot_log` (1.93), `dollar` (2.32), `money`
+(2.03), and `n000` (3.17) all have positive effects on the probability
+of an email being spam. This means that higher occurrences of these
+features increase the likelihood of spam classification. Non-Significant
+/ Negative Effect: `make` (0.86) has a negative effect and is not
+statistically significant, meaning it does not contribute to predicting
+spam effectively.
+
+# Conclision
+
+The analysis demonstrates that log transformation of `crl.tot` improves
+model performance, as indicated by the lowest AIC value in
+`model_scale_log`. Key predictors of spam classification include `bang`,
+`dollar`, `money`, `n000`, and `crl.tot_log`, all of which significantly
+increase the likelihood of an email being spam. In contrast, `make` has
+a negligible or even negative effect, suggesting it may not be a useful
+predictor.
 
 # Further Work
-In the further work, we use the Random Forest model to explore which text characteristics influence whether an email is classified as spam, and further evaluate the GLM model.
+
+In the further work, we use the Random Forest model to explore which
+text characteristics influence whether an email is classified as spam,
+and further evaluate the GLM model.
+
 ```{r}
 set.seed(123)
 index <- createDataPartition(data$yesno, p = 0.7, list = FALSE)
 train_data <- data[index, ]
 test_data <- data[-index, ]
 ```
-In this step, we split the dataset, allocating 70% of the data for training the model (train_data) and the remaining 30% for testing the model (test_data), ensuring its performance on new data.
+
+In this step, we split the dataset, allocating 70% of the data for
+training the model (train_data) and the remaining 30% for testing the
+model (test_data), ensuring its performance on new data.
 
 ```{r}
 glm_model <- glm(yesno ~ bang + crl.tot_log + dollar+money+n000+make, data = train_data, family = binomial(link = 'logit'))
@@ -331,7 +529,12 @@ glm_pred_class <- ifelse(glm_pred_prob > 0.5,'y','n')
 glm_confusion <- confusionMatrix(factor(glm_pred_class), factor(test_data$yesno))
 glm_roc <- roc(test_data$yesno, glm_pred_prob)
 ```
-In this step, we use GLM to train a logistic regression model, which is applied to a binary classification task. Once the training is complete, we make predictions on the test set and then evaluate its classification performance using a confusion matrix and an ROC curve.
+
+In this step, we use GLM to train a logistic regression model, which is
+applied to a binary classification task. Once the training is complete,
+we make predictions on the test set and then evaluate its classification
+performance using a confusion matrix and an ROC curve.
+
 ```{r}
 set.seed(123)
 rf_model <- randomForest(yesno ~ bang + crl.tot_log + dollar+money+n000+make, data = train_data, ntree = 500, importance = TRUE)
@@ -342,14 +545,33 @@ rf_pred_class <- ifelse(rf_pred_prob > 0.5,'y','n')
 rf_confusion <- confusionMatrix(factor(rf_pred_class), factor(test_data$yesno))
 rf_roc <- roc(test_data$yesno, rf_pred_prob)
 ```
-In this step, we use the Random Forest model to train a spam classifier and make predictions on the test set (test_data). The model returns the probability of an email being classified as spam (yes), which is then categorized based on a 0.5 threshold. Subsequently, we evaluate the classification performance using the Confusion Matrix, and compute the ROC Curve and AUC value to assess the overall classification capability of the model.
+
+In this step, we use the Random Forest model to train a spam classifier
+and make predictions on the test set (test_data). The model returns the
+probability of an email being classified as spam (yes), which is then
+categorized based on a 0.5 threshold. Subsequently, we evaluate the
+classification performance using the Confusion Matrix, and compute the
+ROC Curve and AUC value to assess the overall classification capability
+of the model.
+
 ```{r}
-#| label: figure16
+#| label: fig-figure16
 #| fig-cap: RF Variable Importance Ranking
 varImpPlot(rf_model)
 ```
-@figure16 represents the Variable Importance evaluation of the Random Forest model, illustrating the impact of different features on the model.Left plot (MeanDecreaseAccuracy) indicates that the bang variable is the most important, as its removal results in the greatest decrease in model accuracy. crl.tot_log and dollar are also significant, having a considerable impact. The make variable has a minor influence, contributing the least to the model.
-Right plot (MeanDecreaseGini) shows that bang remains the most important variable, making the largest contribution to Gini-based splits. dollar and crl.tot_log also have a strong influence, meaning they effectively distinguish between the yesno categories. The make variable has the lowest Gini importance, indicating it is used less frequently in the splitting process.
+
+@fig-figure16 represents the Variable Importance evaluation of the Random
+Forest model, illustrating the impact of different features on the
+model.Left plot (MeanDecreaseAccuracy) indicates that the bang variable
+is the most important, as its removal results in the greatest decrease
+in model accuracy. crl.tot_log and dollar are also significant, having a
+considerable impact. The make variable has a minor influence,
+contributing the least to the model. Right plot (MeanDecreaseGini) shows
+that bang remains the most important variable, making the largest
+contribution to Gini-based splits. dollar and crl.tot_log also have a
+strong influence, meaning they effectively distinguish between the yesno
+categories. The make variable has the lowest Gini importance, indicating
+it is used less frequently in the splitting process.
 
 ```{r}
 get_model_metrics <- function(model_name, confusion,k) {
@@ -373,12 +595,24 @@ results <- bind_rows(
 
 knitr::kable(results, align = "c")
 ```
-In this step, we calculate and compare the classification performance of Random Forest (RF) and Logistic Regression (GLM). Using the Confusion Matrix and AUC (Area Under the ROC Curve), we extract Accuracy, Sensitivity, Specificity, and Precision, then format the results into a table for an intuitive comparison of different models' performance.
+
+In this step, we calculate and compare the classification performance of
+Random Forest (RF) and Logistic Regression (GLM). Using the Confusion
+Matrix and AUC (Area Under the ROC Curve), we extract Accuracy,
+Sensitivity, Specificity, and Precision, then format the results into a
+table for an intuitive comparison of different models' performance.
+
 ```{r}
-#| label: figure17
+#| label: fig-figure17
 #| fig-cap: ROC Curve Comparison (GLM & RF)
 plot(glm_roc, col = "blue")
 lines(rf_roc, col = "red")
 legend("bottomright", legend = c("GLM", "randomForest"), col = c("blue", "red"), lwd = 2)
 ```
-@figure17 displays the ROC curves for GLM (Logistic Regression, blue) and Random Forest (red) in a binary classification task. The two curves, GLM (blue) and Random Forest (red), are very close to each other, indicating that both models have similar classification performance. The Random Forest (red) slightly outperforms GLM in certain areas, but the overall difference is minimal.
+
+@fig-figure17 displays the ROC curves for GLM (Logistic Regression, blue)
+and Random Forest (red) in a binary classification task. The two curves,
+GLM (blue) and Random Forest (red), are very close to each other,
+indicating that both models have similar classification performance. The
+Random Forest (red) slightly outperforms GLM in certain areas, but the
+overall difference is minimal.
