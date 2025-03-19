@@ -226,6 +226,7 @@ ggplot(data, aes(x=make, fill=yesno)) +
 ```
 @figure13 shows the distribution of make (the proportion of the word "make" in the email) for spam (y) and non-spam (n) emails.Non-spam emails (n) are highly concentrated at 0, with the pink density area forming an extreme peak at 0. Spam emails (y) have a broader distribution, with the blue density area being more dispersed.
 
+
 Replace values below the 1st percentile with the 1st percentile value and values over the 99th percentile with the 99th percentile value, then standardize the data to mitigate the effects of outliers and right skewness. Due to the wide distribution and right-skewed nature of crl.tot, we substitute it with log(data\$crl.tot + 1).
 
 ```{r}
@@ -313,13 +314,14 @@ plot_model(model_scale_log, type = "pred", title = "",col='steelblue')
 
 
 # Further Work
-
+In the further work, we use the Random Forest model to explore which text characteristics influence whether an email is classified as spam, and further evaluate the GLM model.
 ```{r}
 set.seed(123)
 index <- createDataPartition(data$yesno, p = 0.7, list = FALSE)
 train_data <- data[index, ]
 test_data <- data[-index, ]
 ```
+In this step, we split the dataset, allocating 70% of the data for training the model (train_data) and the remaining 30% for testing the model (test_data), ensuring its performance on new data.
 
 ```{r}
 glm_model <- glm(yesno ~ bang + crl.tot_log + dollar+money+n000+make, data = train_data, family = binomial(link = 'logit'))
@@ -329,7 +331,7 @@ glm_pred_class <- ifelse(glm_pred_prob > 0.5,'y','n')
 glm_confusion <- confusionMatrix(factor(glm_pred_class), factor(test_data$yesno))
 glm_roc <- roc(test_data$yesno, glm_pred_prob)
 ```
-
+In this step, we use GLM to train a logistic regression model, which is applied to a binary classification task. Once the training is complete, we make predictions on the test set and then evaluate its classification performance using a confusion matrix and an ROC curve.
 ```{r}
 set.seed(123)
 rf_model <- randomForest(yesno ~ bang + crl.tot_log + dollar+money+n000+make, data = train_data, ntree = 500, importance = TRUE)
@@ -340,13 +342,14 @@ rf_pred_class <- ifelse(rf_pred_prob > 0.5,'y','n')
 rf_confusion <- confusionMatrix(factor(rf_pred_class), factor(test_data$yesno))
 rf_roc <- roc(test_data$yesno, rf_pred_prob)
 ```
-
+In this step, we use the Random Forest model to train a spam classifier and make predictions on the test set (test_data). The model returns the probability of an email being classified as spam (yes), which is then categorized based on a 0.5 threshold. Subsequently, we evaluate the classification performance using the Confusion Matrix, and compute the ROC Curve and AUC value to assess the overall classification capability of the model.
 ```{r}
-#| label: figure 16
+#| label: figure16
 #| fig-cap: RF Variable Importance Ranking
 varImpPlot(rf_model)
 ```
-
+@figure16 represents the Variable Importance evaluation of the Random Forest model, illustrating the impact of different features on the model.Left plot (MeanDecreaseAccuracy) indicates that the bang variable is the most important, as its removal results in the greatest decrease in model accuracy. crl.tot_log and dollar are also significant, having a considerable impact. The make variable has a minor influence, contributing the least to the model.
+Right plot (MeanDecreaseGini) shows that bang remains the most important variable, making the largest contribution to Gini-based splits. dollar and crl.tot_log also have a strong influence, meaning they effectively distinguish between the yesno categories. The make variable has the lowest Gini importance, indicating it is used less frequently in the splitting process.
 
 ```{r}
 get_model_metrics <- function(model_name, confusion,k) {
@@ -370,11 +373,12 @@ results <- bind_rows(
 
 knitr::kable(results, align = "c")
 ```
-
+In this step, we calculate and compare the classification performance of Random Forest (RF) and Logistic Regression (GLM). Using the Confusion Matrix and AUC (Area Under the ROC Curve), we extract Accuracy, Sensitivity, Specificity, and Precision, then format the results into a table for an intuitive comparison of different models' performance.
 ```{r}
-#| label: figure 17
+#| label: figure17
 #| fig-cap: ROC Curve Comparison (GLM & RF)
 plot(glm_roc, col = "blue")
 lines(rf_roc, col = "red")
 legend("bottomright", legend = c("GLM", "randomForest"), col = c("blue", "red"), lwd = 2)
 ```
+@figure17 displays the ROC curves for GLM (Logistic Regression, blue) and Random Forest (red) in a binary classification task. The two curves, GLM (blue) and Random Forest (red), are very close to each other, indicating that both models have similar classification performance. The Random Forest (red) slightly outperforms GLM in certain areas, but the overall difference is minimal.
