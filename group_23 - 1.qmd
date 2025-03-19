@@ -393,20 +393,13 @@ $$\quad \log\left( \frac{p_i}{1 - p_i} \right) = \beta_0 + \beta_1 \text{crl.tot
 
 ## Variable Definitions
 
--   $$Y_i$$: A binary factor variable indicating if the email was spam
-    (`y`) or not (`n`).
--   $$\text{crl.tot}_i$$: Total length of uninterrupted sequences
-    of capital letters.
--   $$\text{dollar}_i$$: Occurrences of the dollar sign (`$`),
-    as a percentage of total number of characters.
--   $$\text{bang}_i$$: Occurrences of `!`, as a percentage of
-    total number of characters.
--   $$\text{money}_i$$: Occurrences of the word "money", as a
-    percentage of total number of characters.
--   $$\text{n000}_i$$: Occurrences of the string "000", as a
-    percentage of total number of characters.
--   $$\text{make}_i$$: Occurrences of the word "make", as a
-    percentage of total number of characters.
+-   $Y_i$: A binary factor variable indicating if the email was spam (`y`) or not (`n`).
+-   $\text{crl.tot}_i$: Total length of uninterrupted sequences of capital letters.
+-   $\text{dollar}_i$: Occurrences of the dollar sign (`$`), as a percentage of total number of characters.
+-   $\text{bang}_i$: Occurrences of `!`, as a percentage of total number of characters.
+-   $\text{money}_i$: Occurrences of the word "money", as a percentage of total number of characters.
+-   $\text{n000}_i$: Occurrences of the string "000", as a percentage of total number of characters.
+-   $\text{make}_i$: Occurrences of the word "make", as a percentage of total number of characters.
 
 ## Alternative Model with Log Transformation
 
@@ -414,21 +407,14 @@ An alternative model is estimated with a log transformation of crl.tot:
 
 $$\quad \log\left( \frac{p_i}{1 - p_i} \right) = \beta_0 + \beta_1 log(\text{crl.tot}_i) + \beta_2 \text{dollar}_i + \beta_3 \text{bang}_i + \beta_4 \text{money}_i + \beta_5 \text{n000}_i + \beta_6 \text{make}_i$$
 
--   $$Y_i$$: A binary factor variable indicating if the email was spam
+-   $Y_i$: A binary factor variable indicating if the email was spam
     (`y`) or not (`n`). 
--   $$log(\text{crl.tot}_i)$$: The
-    logarithm-transformed length of uninterrupted sequences of capital
-    letters.
--   $$\text{dollar}_i$$: Occurrences of the dollar sign (`$`), as
-    a percentage of total number of characters.
--   $$\text{bang}_i$$: Occurrences of `!`, as a percentage of
-    total number of characters.
--   $$\text{money}_i$$: Occurrences of the word "money", as a
-    percentage of total number of characters.
--   $$\text{n000}_i$$: Occurrences of the string "000", as a
-    percentage of total number of characters.
--   $$\text{make}_i$$: Occurrences of the word "make", as a
-    percentage of total number of characters.
+-   $log(\text{crl.tot}_i)$: The logarithm-transformed length of uninterrupted sequences of capital letters.
+-   $\text{dollar}_i$: Occurrences of the dollar sign (`$`), as a percentage of total number of characters.
+-   $\text{bang}_i$: Occurrences of `!`, as a percentage of total number of characters.
+-   $\text{money}_i$: Occurrences of the word "money", as a percentage of total number of characters.
+-   $\text{n000}_i$: Occurrences of the string "000", as a percentage of total number of characters.
+-   $\text{make}_i$: Occurrences of the word "make", as a percentage of total number of characters.
 
 ## Logistic regression models
 
