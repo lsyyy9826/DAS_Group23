@@ -134,10 +134,15 @@ ggplot(data, aes(x=make, fill=yesno)) +
   labs(title="make Density by Class")
 ```
 
-#Replace values below the 1st percentile with the 1st percentile value and values over the 99th percentile with the 99th percentile value, then standardize the data to mitigate the effects of outliers and right skewness. Due to the wide distribution and right-skewed nature of crl.tot, we substitute it with log(data\$crl.tot + 1).
+# Modelling
+In the modeling section, data preprocessing was first conducted, including winsorization (outlier removal), standardization, and logarithmic transformation. Subsequently, three logistic regression models were constructed: one using the original data, one with standardized variables, and another incorporating log-transformed variables. The Akaike Information Criterion (AIC) was employed to compare model performance. Finally, regression coefficients and predictive outcomes were visualized. The ultimate objective was to identify the optimal transformation of predictor variables to enhance model performance.
 
+## Data Preprocessing
+Replace values below the 1st percentile with the 1st percentile value and values over the 99th percentile with the 99th percentile value, then standardize the data to mitigate the effects of outliers and right skewness. Due to the wide distribution and right-skewed nature of crl.tot, we substitute it with log(data\$crl.tot + 1).
 ```{r}
 data1<-data
+
+# Winsorization function to limit extreme values
 win <- function(x, lower_perc = 0.01, upper_perc = 0.99) {
   x <- as.numeric(x)
   q <- quantile(x, probs = c(lower_perc, upper_perc), na.rm = TRUE)
@@ -145,9 +150,15 @@ win <- function(x, lower_perc = 0.01, upper_perc = 0.99) {
   x[x > q[2]] <- q[2]
   return(x)
 }
+
+# Define numeric variables and apply winsorization
 numeric_vars <- c("crl.tot", "dollar", "bang", "money", "n000", "make")
 data[numeric_vars] <- lapply(data[numeric_vars], win)
+
+# Log transformation of crl.tot
 data[,1:6]<-scale(data[,1:6])
+
+# Log transformation of crl.tot
 data$crl.tot_log <- log(data$crl.tot+1)
 
 ```
@@ -156,36 +167,23 @@ $$Y_i \sim \mathrm{Bernoulli}(p_i)$$
 
 $$\quad \log\left( \frac{p_i}{1 - p_i} \right) = \beta_0 + \beta_1 \text{crl.tot}_i + \beta_2 \text{dollar}_i + \beta_3 \text{bang}_i + \beta_4 \text{money}_i + \beta_5 \text{n000}_i + \beta_6 \text{make}_i$$
 
--**$Y_i$** is ..
+## Variable Definitions
+- **\(Y_i\)**: A binary factor variable indicating if the email was spam (`y`) or not (`n`).
+- **\(\text{crl.tot}_i\)**: Total length of uninterrupted sequences of capital letters.
+- **\(\text{dollar}_i\)**: Occurrences of the dollar sign (`$`), as a percentage of total number of characters.
+- **\(\text{bang}_i\)**: Occurrences of `!`, as a percentage of total number of characters.
+- **\(\text{money}_i\)**: Occurrences of the word "money", as a percentage of total number of characters.
+- **\(\text{n000}_i\)**: Occurrences of the string "000", as a percentage of total number of characters.
+- **\(\text{make}_i\)**: Occurrences of the word "make", as a percentage of total number of characters.
 
--**$\text{crl.tot}_i$** is..
+## Alternative Model with Log Transformation
 
--**$\text{dollar}_i$** is..
+An alternative model is estimated with a log transformation of `crl.tot`:
+$$
+\log\left( \frac{p_i}{1 - p_i} \right) = \beta_0 + \beta_1 \log(\text{crl.tot}_i) + \beta_2 \text{dollar}_i + \beta_3 \text{bang}_i + \beta_4 \text{money}_i + \beta_5 \text{n000}_i + \beta_6 \text{make}_i
+$$
 
--**$\text{bang}_i$** is..
-
--**$\text{money}_i$** is
-
--**$\text{n000}_i$** is
-
--**$\text{make}_i$** is ..
-
-$$\quad \log\left( \frac{p_i}{1 - p_i} \right) = \beta_0 + \beta_1 log(\text{crl.tot}_i) + \beta_2 \text{dollar}_i + \beta_3 \text{bang}_i + \beta_4 \text{money}_i + \beta_5 \text{n000}_i + \beta_6 \text{make}_i$$
-
--**$Y_i$** is ..
-
--**$log(\text{crl.tot}_i)$** is..
-
--**$\text{dollar}_i$** is..
-
--**$\text{bang}_i$** is..
-
--**$\text{money}_i$** is
-
--**$\text{n000}_i$** is
-
--**$\text{make}_i$** is ..
-
+## Logistic regression models
 ```{r}
 model_original <- glm(yesno ~ crl.tot + dollar + bang + money + n000 + make,
              family = binomial(link = "logit"),
@@ -202,14 +200,37 @@ summary(model_scale)
 model_scale_log <- glm(yesno ~ bang + crl.tot_log + dollar+money+n000+make,
                family = binomial(link = "logit"), data = data)
 summary(model_scale_log)
+```
 
+## Model Comparison using AIC
+```{r}
 AIC(model_original,model_scale,model_scale_log)
 ```
+The Akaike Information Criterion (AIC) values indicate the performance of the three logistic regression models:
+- model_original: AIC = 592.74
+- model_scale: AIC = 589.17 (improved after standardization)
+- model_scale_log: AIC = 579.11 (best-performing model with log transformation)
 
+Since a lower AIC value indicates a better fit, the log-transformed model (`model_scale_log`) is the optimal choice, as it achieves the lowest AIC.
+
+## Model Visualization
 ```{r}
 plot_model(model_scale_log, show.values = TRUE, show.p = TRUE)
+```
+The coefficient plot displays the estimated odds ratios:
+Significant Positive Effects: `bang` (3.11), `crl.tot_log` (1.93), `dollar` (2.32), `money` (2.03), and `n000` (3.17) all have positive effects on the probability of an email being spam. This means that higher occurrences of these features increase the likelihood of spam classification.
+Non-Significant / Negative Effect: `make` (0.86) has a negative effect and is not statistically significant, meaning it does not contribute to predicting spam effectively.
+
+## Predicted probabilities
+```{r}
 plot_model(model_scale_log, type = "pred", title = "",col='steelblue')
 ```
+The coefficient plot displays the estimated odds ratios:
+Significant Positive Effects: `bang` (3.11), `crl.tot_log` (1.93), `dollar` (2.32), `money` (2.03), and `n000` (3.17) all have positive effects on the probability of an email being spam. This means that higher occurrences of these features increase the likelihood of spam classification.
+Non-Significant / Negative Effect: `make` (0.86) has a negative effect and is not statistically significant, meaning it does not contribute to predicting spam effectively.
+
+# Conclision
+The analysis demonstrates that log transformation of `crl.tot` improves model performance, as indicated by the lowest AIC value in `model_scale_log`. Key predictors of spam classification include `bang`, `dollar`, `money`, `n000`, and `crl.tot_log`, all of which significantly increase the likelihood of an email being spam. In contrast, `make` has a negligible or even negative effect, suggesting it may not be a useful predictor.  
 
 # Further Work
 
